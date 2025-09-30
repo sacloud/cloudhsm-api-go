@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"testing"
 
-	client "github.com/sacloud/api-client-go"
 	. "github.com/sacloud/cloudhsm-api-go"
 	v1 "github.com/sacloud/cloudhsm-api-go/apis/v1"
 	"github.com/sacloud/packages-go/testutil"
@@ -163,7 +162,7 @@ func TestLicenseOp_Delete_400(t *testing.T) {
 
 func TestLicenseIntegrated(t *testing.T) {
 	assert := require.New(t)
-	client := newIntegratedClient(t, client.WithOptions(&client.Options{Trace: true}))
+	client := newIntegratedClient(t)
 	api := NewLicenseOp(client)
 	ctx := context.Background()
 
