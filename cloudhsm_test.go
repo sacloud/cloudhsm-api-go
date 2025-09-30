@@ -161,6 +161,7 @@ func TestCloudHSMOp_Delete_400(t *testing.T) {
 	assert.ErrorContains(err, "Not Found")
 }
 
+//nolint:gosec // no security issue here
 func TestCloudHSMIntegrated(t *testing.T) {
 	assert := require.New(t)
 	client := newIntegratedClient(t, client.WithOptions(&client.Options{Trace: true}))
