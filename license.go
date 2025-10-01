@@ -145,7 +145,7 @@ func (op *LicenseOp) Update(ctx context.Context, id string, p CloudHSMSoftwareLi
 	} else if e.StatusCode == http.StatusUnprocessableEntity {
 		return nil, NewAPIError("License.Update", e.StatusCode, errors.Wrap(err, "invalid parameter"))
 	} else {
-		return nil, NewAPIError("License.Update", 0, err)
+		return nil, NewAPIError("License.Update", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
