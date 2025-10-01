@@ -21,7 +21,6 @@ import (
 	"net/http"
 	"testing"
 
-	client "github.com/sacloud/api-client-go"
 	. "github.com/sacloud/cloudhsm-api-go"
 	v1 "github.com/sacloud/cloudhsm-api-go/apis/v1"
 	"github.com/sacloud/packages-go/testutil"
@@ -164,7 +163,7 @@ func TestCloudHSMOp_Delete_400(t *testing.T) {
 //nolint:gosec // no security issue here
 func TestCloudHSMIntegrated(t *testing.T) {
 	assert := require.New(t)
-	client := newIntegratedClient(t, client.WithOptions(&client.Options{Trace: true}))
+	client := newIntegratedClient(t)
 	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 

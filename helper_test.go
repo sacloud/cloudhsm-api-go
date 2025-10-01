@@ -132,6 +132,7 @@ var TemplateCloudHSM = func() v1.CloudHSM {
 	var ret v1.CloudHSM
 	ret.SetFake()
 	ret.SetTags(TemplateTags)
+	ret.SetAvailability(v1.AvailabilityEnumAvailable)
 
 	return ret
 }()
@@ -154,6 +155,34 @@ var TemplateWrappedCreateCloudHSM = func() v1.WrappedCreateCloudHSM {
 var TemplateWrappedCloudHSM = func() v1.WrappedCloudHSM {
 	var ret v1.WrappedCloudHSM
 	ret.SetCloudHSM(TemplateCloudHSM)
+
+	return ret
+}()
+
+var TemplateCloudHSMPeer = func() v1.CloudHSMPeer {
+	var ret v1.CloudHSMPeer
+	ret.SetFake()
+
+	return ret
+}()
+
+var TemplateWrappedCloudHSMPeer = func() v1.WrappedCloudHSMPeer {
+	var ret v1.WrappedCloudHSMPeer
+	ret.SetPeer(TemplateCloudHSMPeer)
+
+	return ret
+}()
+
+var TemplateCreateCloudHSMPeer = func() v1.CreateCloudHSMPeer {
+	var ret v1.CreateCloudHSMPeer
+	ret.SetFake()
+
+	return ret
+}()
+
+var TemplateWrappedCreateCloudHSMPeer = func() v1.WrappedCreateCloudHSMPeer {
+	var ret v1.WrappedCreateCloudHSMPeer
+	ret.SetPeer(TemplateCreateCloudHSMPeer)
 
 	return ret
 }()
