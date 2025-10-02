@@ -50,16 +50,12 @@ func (op *LicenseOp) List(ctx context.Context) ([]v1.CloudHSMSoftwareLicense, er
 }
 
 type CloudHSMSoftwareLicenseCreateParams struct {
-	ServiceClass v1.CloudHSMSoftwareLicenseServiceClassEnum
-	Name         string
-	Description  *string
-	Tags         []string
+	Name        string
+	Description *string
+	Tags        []string
 }
 
 func (op *LicenseOp) Create(ctx context.Context, p CloudHSMSoftwareLicenseCreateParams) (*v1.CreateCloudHSMSoftwareLicense, error) {
-	if p.ServiceClass == "" {
-		p.ServiceClass = v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7
-	}
 	if p.Tags == nil {
 		p.Tags = []string{}
 	}
@@ -67,7 +63,7 @@ func (op *LicenseOp) Create(ctx context.Context, p CloudHSMSoftwareLicenseCreate
 		ctx,
 		&v1.WrappedCreateCloudHSMSoftwareLicense{
 			CloudHSM: v1.CreateCloudHSMSoftwareLicense{
-				ServiceClass: p.ServiceClass,
+				ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
 				Name:         p.Name,
 				Description:  intoOpt[v1.OptString](p.Description),
 				Tags:         p.Tags,
@@ -108,16 +104,12 @@ func (op *LicenseOp) Read(ctx context.Context, id string) (*v1.CloudHSMSoftwareL
 }
 
 type CloudHSMSoftwareLicenseUpdateParams struct {
-	ServiceClass v1.CloudHSMSoftwareLicenseServiceClassEnum
-	Name         string
-	Description  string
-	Tags         []string
+	Name        string
+	Description string
+	Tags        []string
 }
 
 func (op *LicenseOp) Update(ctx context.Context, id string, p CloudHSMSoftwareLicenseUpdateParams) (*v1.CloudHSMSoftwareLicense, error) {
-	if p.ServiceClass == "" {
-		p.ServiceClass = v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7
-	}
 	if p.Tags == nil {
 		p.Tags = []string{}
 	}
@@ -126,7 +118,7 @@ func (op *LicenseOp) Update(ctx context.Context, id string, p CloudHSMSoftwareLi
 		ctx,
 		&v1.WrappedCloudHSMSoftwareLicense{
 			CloudHSM: v1.CloudHSMSoftwareLicense{
-				ServiceClass: p.ServiceClass,
+				ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
 				Name:         p.Name,
 				Description:  p.Description,
 				Tags:         p.Tags,

@@ -80,9 +80,8 @@ func TestLicenseOp_Create(t *testing.T) {
 	ctx := context.Background()
 
 	res, err := api.Create(ctx, CloudHSMSoftwareLicenseCreateParams{
-		Name:         "Test License",
-		Description:  ref("This is a test license"),
-		ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
+		Name:        "Test License",
+		Description: ref("This is a test license"),
 		Tags: []string{
 			"tag1",
 			"tag2",
@@ -113,9 +112,8 @@ func TestLicenseOp_Update(t *testing.T) {
 	ctx := context.Background()
 
 	res, err := api.Update(ctx, "12345", CloudHSMSoftwareLicenseUpdateParams{
-		ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
-		Description:  "Updated Description",
-		Name:         "Updated Name",
+		Description: "Updated Description",
+		Name:        "Updated Name",
 		Tags: []string{
 			"tag1",
 			"tag2",
@@ -169,9 +167,8 @@ func TestLicenseIntegrated(t *testing.T) {
 
 	// Create
 	created, err := api.Create(ctx, CloudHSMSoftwareLicenseCreateParams{
-		ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
-		Name:         testutil.RandomName("test-license-", 16, testutil.CharSetAlphaNum),
-		Description:  ref(testutil.Random(128, testutil.CharSetAlphaNum)),
+		Name:        testutil.RandomName("test-license-", 16, testutil.CharSetAlphaNum),
+		Description: ref(testutil.Random(128, testutil.CharSetAlphaNum)),
 	})
 	assert.NoError(err)
 	assert.NotNil(created)
@@ -198,9 +195,8 @@ func TestLicenseIntegrated(t *testing.T) {
 	// Update
 	newDesc := "updated integration test License"
 	updateReq := CloudHSMSoftwareLicenseUpdateParams{
-		Description:  newDesc,
-		Name:         read.GetName(),
-		ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
+		Description: newDesc,
+		Name:        read.GetName(),
 	}
 	updated, err := api.Update(ctx, created.GetID(), updateReq)
 	assert.NoError(err)
