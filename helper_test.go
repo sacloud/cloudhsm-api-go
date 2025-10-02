@@ -186,3 +186,32 @@ var TemplateWrappedCreateCloudHSMPeer = func() v1.WrappedCreateCloudHSMPeer {
 
 	return ret
 }()
+
+var TemplateCloudHSMClient = func() v1.CloudHSMClient {
+	var ret v1.CloudHSMClient
+	ret.SetFake()
+	ret.SetAvailability(v1.AvailabilityEnumAvailable)
+	return ret
+}()
+
+var TemplateWrappedCloudHSMClient = func() v1.WrappedCloudHSMClient {
+	var ret v1.WrappedCloudHSMClient
+	ret.SetClient(TemplateCloudHSMClient)
+
+	return ret
+}
+
+var TemplateCreateCloudHSMClient = func() v1.CreateCloudHSMClient {
+	var ret v1.CreateCloudHSMClient
+	ret.SetFake()
+	ret.SetAvailability(v1.AvailabilityEnumAvailable)
+
+	return ret
+}()
+
+var TemplateWrappedCreateCloudHSMClient = func() v1.WrappedCreateCloudHSMClient {
+	var ret v1.WrappedCreateCloudHSMClient
+	ret.SetClient(TemplateCreateCloudHSMClient)
+
+	return ret
+}()
