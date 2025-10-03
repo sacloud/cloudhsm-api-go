@@ -59,11 +59,11 @@ func (op *PeerOp) List(ctx context.Context) ([]v1.CloudHSMPeer, error) {
 	if err == nil {
 		return resp.GetPeers(), nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("CloudHSM.Read", 0, err)
+		return nil, NewAPIError("Peer.List", 0, err)
 	} else if e.StatusCode == http.StatusNotFound {
-		return nil, NewAPIError("CloudHSM.Read", e.StatusCode, errors.Wrap(err, "not found"))
+		return nil, NewAPIError("Peer.List", e.StatusCode, errors.Wrap(err, "not found"))
 	} else {
-		return nil, NewAPIError("CloudHSM.Read", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return nil, NewAPIError("Peer.List", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -90,11 +90,11 @@ func (op *PeerOp) Create(ctx context.Context, p CloudHSMPeerCreateParams) (*v1.C
 		ret := resp.GetPeer()
 		return &ret, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("CloudHSMPeer.Create", 0, err)
+		return nil, NewAPIError("Peer.Create", 0, err)
 	} else if e.StatusCode == http.StatusUnprocessableEntity {
-		return nil, NewAPIError("CloudHSMPeer.Create", e.StatusCode, errors.Wrap(err, "invalid parameter"))
+		return nil, NewAPIError("Peer.Create", e.StatusCode, errors.Wrap(err, "invalid parameter"))
 	} else {
-		return nil, NewAPIError("CloudHSMPeer.Create", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return nil, NewAPIError("Peer.Create", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -109,10 +109,10 @@ func (op *PeerOp) Delete(ctx context.Context, id string) error {
 	if err == nil {
 		return nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return NewAPIError("CloudHSMPeer.Delete", 0, err)
+		return NewAPIError("Peer.Delete", 0, err)
 	} else if e.StatusCode == http.StatusNotFound {
-		return NewAPIError("CloudHSMPeer.Delete", e.StatusCode, errors.Wrap(err, "not found"))
+		return NewAPIError("Peer.Delete", e.StatusCode, errors.Wrap(err, "not found"))
 	} else {
-		return NewAPIError("CloudHSMPeer.Delete", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return NewAPIError("Peer.Delete", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
