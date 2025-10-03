@@ -16,71 +16,74 @@ package cloudhsm_test
 
 import (
 	"context"
+	"fmt"
+	"math/rand/v2"
 	"net/http"
 	"testing"
 
+	client "github.com/sacloud/api-client-go"
 	. "github.com/sacloud/cloudhsm-api-go"
 	v1 "github.com/sacloud/cloudhsm-api-go/apis/v1"
 	"github.com/sacloud/packages-go/testutil"
 	"github.com/stretchr/testify/require"
 )
 
-func newTestLicenseClient(resp interface{}, status ...int) *v1.Client {
+func newTestCloudHSMClient(resp interface{}, status ...int) *v1.Client {
 	return newTestClient(resp, status...)
 }
 
-func TestLicenseOp_List(t *testing.T) {
+func TestCloudHSMOp_List(t *testing.T) {
 	assert := require.New(t)
-	expected := v1.PaginatedCloudHSMSoftwareLicenseList{
+	expected := v1.PaginatedCloudHSMList{
 		Count:     1,
 		From:      v1.NewOptInt(0),
 		Total:     v1.NewOptInt(1),
-		CloudHSMs: []v1.CloudHSMSoftwareLicense{TemplateLicense},
+		CloudHSMs: []v1.CloudHSM{TemplateCloudHSM},
 	}
-	client := newTestLicenseClient(expected)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(expected)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
-	licenses, err := api.List(ctx)
+	cloudhsms, err := api.List(ctx)
 
 	assert.NoError(err)
-	assert.NotNil(licenses)
-	assert.Equal(1, len(licenses))
+	assert.NotNil(cloudhsms)
+	assert.Equal(1, len(cloudhsms))
 }
 
-func TestLicenseOp_Read(t *testing.T) {
+func TestCloudHSMOp_Read(t *testing.T) {
 	assert := require.New(t)
-	client := newTestLicenseClient(TemplateWrappedLicense)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(TemplateWrappedCloudHSM)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
 	res, err := api.Read(ctx, "12345")
 	assert.NoError(err)
 	assert.NotNil(res)
-	assert.Equal(TemplateWrappedLicense.GetCloudHSM(), *res)
+	assert.Equal(TemplateWrappedCloudHSM.GetCloudHSM(), *res)
 }
 
-func TestLicenseOp_Read_404(t *testing.T) {
+func TestCloudHSMOp_Read_404(t *testing.T) {
 	assert := require.New(t)
-	expected := newErrorResponse("No License matches the given query.")
-	client := newTestLicenseClient(expected, http.StatusNotFound)
-	api := NewLicenseOp(client)
+	expected := newErrorResponse("No CloudHSM matches the given query.")
+	client := newTestCloudHSMClient(expected, http.StatusNotFound)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
-	license, err := api.Read(ctx, "99999")
-	assert.Nil(license)
+	cloudhsm, err := api.Read(ctx, "99999")
+	assert.Nil(cloudhsm)
 	assert.Error(err)
 	assert.ErrorContains(err, "Not Found")
 }
 
-func TestLicenseOp_Create(t *testing.T) {
+func TestCloudHSMOp_Create(t *testing.T) {
 	assert := require.New(t)
-	client := newTestLicenseClient(TemplateWrappedCreateLicense, http.StatusCreated)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(TemplateWrappedCreateCloudHSM, http.StatusCreated)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
-	res, err := api.Create(ctx, CloudHSMSoftwareLicenseCreateParams{
-		Name:        "Test License",
-		Description: ref("This is a test license"),
+	res, err := api.Create(ctx, CloudHSMCreateParams{
+		Name:        "Test HSM",
+		Description: ref("This is a test HSM"),
 		Tags: []string{
 			"tag1",
 			"tag2",
@@ -88,30 +91,30 @@ func TestLicenseOp_Create(t *testing.T) {
 	})
 	assert.NoError(err)
 	assert.NotNil(res)
-	assert.Equal(TemplateWrappedCreateLicense.GetCloudHSM(), *res)
+	assert.Equal(TemplateWrappedCreateCloudHSM.GetCloudHSM(), *res)
 }
 
-func TestLicenseOp_Create_422(t *testing.T) {
+func TestCloudHSMOp_Create_422(t *testing.T) {
 	assert := require.New(t)
 	expected := newErrorResponse("Invalid request body.")
-	client := newTestLicenseClient(expected, http.StatusUnprocessableEntity)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(expected, http.StatusUnprocessableEntity)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
-	license, err := api.Create(ctx, CloudHSMSoftwareLicenseCreateParams{})
-	assert.Nil(license)
+	cloudhsm, err := api.Create(ctx, CloudHSMCreateParams{})
+	assert.Nil(cloudhsm)
 	assert.Error(err)
 	assert.ErrorContains(err, "invalid")
 }
 
-func TestLicenseOp_Update(t *testing.T) {
+func TestCloudHSMOp_Update(t *testing.T) {
 	assert := require.New(t)
-	client := newTestLicenseClient(TemplateWrappedLicense)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(TemplateWrappedCloudHSM)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
-	res, err := api.Update(ctx, "12345", CloudHSMSoftwareLicenseUpdateParams{
-		Description: "Updated Description",
+	res, err := api.Update(ctx, "12345", CloudHSMUpdateParams{
+		Description: ref("Updated Description"),
 		Name:        "Updated Name",
 		Tags: []string{
 			"tag1",
@@ -120,37 +123,37 @@ func TestLicenseOp_Update(t *testing.T) {
 	})
 	assert.NoError(err)
 	assert.NotNil(res)
-	assert.Equal(TemplateWrappedLicense.GetCloudHSM(), *res)
+	assert.Equal(TemplateWrappedCloudHSM.GetCloudHSM(), *res)
 }
 
-func TestLicenseOp_Update_400(t *testing.T) {
+func TestCloudHSMOp_Update_400(t *testing.T) {
 	assert := require.New(t)
 	expected := newErrorResponse("Invalid update parameters.")
-	client := newTestLicenseClient(expected, http.StatusUnprocessableEntity)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(expected, http.StatusUnprocessableEntity)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
-	license, err := api.Update(ctx, "0", CloudHSMSoftwareLicenseUpdateParams{})
-	assert.Nil(license)
+	cloudhsm, err := api.Update(ctx, "0", CloudHSMUpdateParams{})
+	assert.Nil(cloudhsm)
 	assert.Error(err)
 	assert.ErrorContains(err, "invalid")
 }
 
-func TestLicenseOp_Delete(t *testing.T) {
+func TestCloudHSMOp_Delete(t *testing.T) {
 	assert := require.New(t)
-	client := newTestLicenseClient(nil, http.StatusNoContent)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(nil, http.StatusNoContent)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
 	err := api.Delete(ctx, "12345")
 	assert.NoError(err)
 }
 
-func TestLicenseOp_Delete_400(t *testing.T) {
+func TestCloudHSMOp_Delete_400(t *testing.T) {
 	assert := require.New(t)
 	expected := newErrorResponse("Not found")
-	client := newTestLicenseClient(expected, http.StatusNotFound)
-	api := NewLicenseOp(client)
+	client := newTestCloudHSMClient(expected, http.StatusNotFound)
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
 	err := api.Delete(ctx, "0")
@@ -158,16 +161,20 @@ func TestLicenseOp_Delete_400(t *testing.T) {
 	assert.ErrorContains(err, "Not Found")
 }
 
-func TestLicenseIntegrated(t *testing.T) {
+//nolint:gosec // no security issue here
+func TestCloudHSMIntegrated(t *testing.T) {
 	assert := require.New(t)
-	client := newIntegratedClient(t)
-	api := NewLicenseOp(client)
+	client := newIntegratedClient(t, client.WithOptions(&client.Options{Trace: true}))
+	api := NewCloudHSMOp(client)
 	ctx := context.Background()
 
 	// Create
-	created, err := api.Create(ctx, CloudHSMSoftwareLicenseCreateParams{
-		Name:        testutil.RandomName("test-license-", 16, testutil.CharSetAlphaNum),
+	created, err := api.Create(ctx, CloudHSMCreateParams{
+		Name:        testutil.RandomName("test-cloudhsm-", 16, testutil.CharSetAlphaNum),
 		Description: ref(testutil.Random(128, testutil.CharSetAlphaNum)),
+		// This IP address is arbitrary, but recommended to be in the private range.
+		IPv4NetworkAddress: fmt.Sprintf("172.%d.%d.0", rand.Uint32N(31), rand.Uint32N(255)),
+		IPv4PrefixLength:   28,
 	})
 	assert.NoError(err)
 	assert.NotNil(created)
@@ -186,15 +193,15 @@ func TestLicenseIntegrated(t *testing.T) {
 	assert.Equal(created.GetName(), read.GetName())
 
 	// List
-	licenses, err := api.List(ctx)
+	cloudhsms, err := api.List(ctx)
 	assert.NoError(err)
-	assert.NotNil(licenses)
-	assert.NotEmpty(licenses)
+	assert.NotNil(cloudhsms)
+	assert.NotEmpty(cloudhsms)
 
 	// Update
-	newDesc := "updated integration test License"
-	updateReq := CloudHSMSoftwareLicenseUpdateParams{
-		Description: newDesc,
+	newDesc := "updated integration test CloudHSM"
+	updateReq := CloudHSMUpdateParams{
+		Description: ref(newDesc),
 		Name:        read.GetName(),
 	}
 	updated, err := api.Update(ctx, created.GetID(), updateReq)

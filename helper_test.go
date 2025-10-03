@@ -127,3 +127,33 @@ var TemplateWrappedLicense = func() v1.WrappedCloudHSMSoftwareLicense {
 
 	return ret
 }()
+
+var TemplateCloudHSM = func() v1.CloudHSM {
+	var ret v1.CloudHSM
+	ret.SetFake()
+	ret.SetTags(TemplateTags)
+
+	return ret
+}()
+
+var TemplateCreateCloudHSM = func() v1.CreateCloudHSM {
+	var ret v1.CreateCloudHSM
+	ret.SetFake()
+	ret.SetTags(TemplateTags)
+
+	return ret
+}()
+
+var TemplateWrappedCreateCloudHSM = func() v1.WrappedCreateCloudHSM {
+	var ret v1.WrappedCreateCloudHSM
+	ret.SetCloudHSM(TemplateCreateCloudHSM)
+
+	return ret
+}()
+
+var TemplateWrappedCloudHSM = func() v1.WrappedCloudHSM {
+	var ret v1.WrappedCloudHSM
+	ret.SetCloudHSM(TemplateCloudHSM)
+
+	return ret
+}()
