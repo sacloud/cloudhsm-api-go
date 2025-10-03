@@ -59,9 +59,9 @@ func (op *ClientOp) List(ctx context.Context) ([]v1.CloudHSMClient, error) {
 	if err == nil {
 		return resp.GetClients(), nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("CloudHSM.Read", 0, err)
+		return nil, NewAPIError("Client.List", 0, err)
 	} else {
-		return nil, NewAPIError("CloudHSM.Read", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return nil, NewAPIError("Client.List", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -98,11 +98,11 @@ func (op *ClientOp) Create(ctx context.Context, p CloudHSMClientCreateParams) (*
 		}
 		return &client, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("CloudHSMClient.Create", 0, err)
+		return nil, NewAPIError("Client.Create", 0, err)
 	} else if e.StatusCode == http.StatusUnprocessableEntity {
-		return nil, NewAPIError("CloudHSMClient.Create", e.StatusCode, errors.Wrap(err, "invalid parameter"))
+		return nil, NewAPIError("Client.Create", e.StatusCode, errors.Wrap(err, "invalid parameter"))
 	} else {
-		return nil, NewAPIError("CloudHSMClient.Create", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return nil, NewAPIError("Client.Create", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -119,11 +119,11 @@ func (op *ClientOp) Read(ctx context.Context, id string) (*v1.CloudHSMClient, er
 		client := resp.GetClient()
 		return &client, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("CloudHSMClient.Read", 0, err)
+		return nil, NewAPIError("Client.Read", 0, err)
 	} else if e.StatusCode == http.StatusNotFound {
-		return nil, NewAPIError("CloudHSMClient.Read", e.StatusCode, errors.Wrap(err, "not found"))
+		return nil, NewAPIError("Client.Read", e.StatusCode, errors.Wrap(err, "not found"))
 	} else {
-		return nil, NewAPIError("CloudHSMClient.Read", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return nil, NewAPIError("Client.Read", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -152,11 +152,11 @@ func (op *ClientOp) Update(ctx context.Context, id string, p CloudHSMClientUpdat
 		client := resp.GetClient()
 		return &client, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("CloudHSMClient.Update", 0, err)
+		return nil, NewAPIError("Client.Update", 0, err)
 	} else if e.StatusCode == http.StatusUnprocessableEntity {
-		return nil, NewAPIError("CloudHSMClient.Update", e.StatusCode, errors.Wrap(err, "invalid parameter"))
+		return nil, NewAPIError("Client.Update", e.StatusCode, errors.Wrap(err, "invalid parameter"))
 	} else {
-		return nil, NewAPIError("CloudHSMClient.Update", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return nil, NewAPIError("Client.Update", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -172,10 +172,10 @@ func (op *ClientOp) Delete(ctx context.Context, id string) error {
 	if err == nil {
 		return nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return NewAPIError("CloudHSMClient.Delete", 0, err)
+		return NewAPIError("Client.Delete", 0, err)
 	} else if e.StatusCode == http.StatusNotFound {
-		return NewAPIError("CloudHSMClient.Delete", e.StatusCode, errors.Wrap(err, "not found"))
+		return NewAPIError("Client.Delete", e.StatusCode, errors.Wrap(err, "not found"))
 	} else {
-		return NewAPIError("CloudHSMClient.Delete", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return NewAPIError("Client.Delete", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
