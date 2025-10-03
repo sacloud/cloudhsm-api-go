@@ -27,7 +27,7 @@ import (
 
 const (
 	// DefaultAPIRootURL デフォルトのAPIルートURL
-	DefaultAPIRootURL = "https://secure.sakura.ad.jp/cloud/zone/is1a/api/cloud/1.1/cloudhsm/"
+	DefaultAPIRootURL = "https://secure.sakura.ad.jp/cloud/zone/is1b/api/cloud/1.1/"
 )
 
 var (

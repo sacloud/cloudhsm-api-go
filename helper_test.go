@@ -28,6 +28,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type ErrorResponse struct {
+	Message string `json:"error_msg"`
+	IsOk    bool   `json:"is_ok"`
+}
+
+func newErrorResponse(message string) ErrorResponse {
+	return ErrorResponse{
+		Message: message,
+		IsOk:    false,
+	}
+}
+
 func newTestClient(v any, s ...int) *v1.Client {
 	s = append(s, http.StatusOK)
 	j, e := json.Marshal(v)
@@ -73,3 +85,45 @@ func newIntegratedClient(t *testing.T, params ...client.ClientParam) *v1.Client 
 	require.NoError(t, err)
 	return ret
 }
+
+func ref[T any](v T) *T {
+	return &v
+}
+
+var TemplateDateTime = func() v1.DateTime {
+	var ret v1.DateTime
+	ret.SetFake()
+	return ret
+}
+
+var TemplateTags = []string{"tag1", "tag2"}
+
+var TemplateLicense = func() v1.CloudHSMSoftwareLicense {
+	var ret v1.CloudHSMSoftwareLicense
+	ret.SetFake()
+	ret.SetTags(TemplateTags)
+
+	return ret
+}()
+
+var TemplateCreateLicense = func() v1.CreateCloudHSMSoftwareLicense {
+	var ret v1.CreateCloudHSMSoftwareLicense
+	ret.SetFake()
+	ret.SetTags(TemplateTags)
+
+	return ret
+}()
+
+var TemplateWrappedCreateLicense = func() v1.WrappedCreateCloudHSMSoftwareLicense {
+	var ret v1.WrappedCreateCloudHSMSoftwareLicense
+	ret.SetCloudHSM(TemplateCreateLicense)
+
+	return ret
+}()
+
+var TemplateWrappedLicense = func() v1.WrappedCloudHSMSoftwareLicense {
+	var ret v1.WrappedCloudHSMSoftwareLicense
+	ret.SetCloudHSM(TemplateLicense)
+
+	return ret
+}()
