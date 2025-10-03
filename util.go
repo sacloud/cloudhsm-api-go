@@ -14,4 +14,17 @@
 
 package cloudhsm
 
-const Version = "0.1.0"
+// generic-ish type cast helper function
+func intoOpt[T, U any, P interface {
+	*T
+	Reset()
+	SetTo(u U)
+}](v *U) T {
+	var opt T
+	if v == nil {
+		P(&opt).Reset()
+	} else {
+		P(&opt).SetTo(*v)
+	}
+	return opt
+}
