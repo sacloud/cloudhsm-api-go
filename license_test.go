@@ -32,10 +32,10 @@ func newTestLicenseClient(resp interface{}, status ...int) *v1.Client {
 func TestLicenseOp_List(t *testing.T) {
 	assert := require.New(t)
 	expected := v1.PaginatedCloudHSMSoftwareLicenseList{
-		Count:     1,
-		From:      v1.NewOptInt(0),
-		Total:     v1.NewOptInt(1),
-		CloudHSMs: []v1.CloudHSMSoftwareLicense{TemplateLicense},
+		Count:    1,
+		From:     v1.NewOptInt(0),
+		Total:    v1.NewOptInt(1),
+		Licenses: []v1.CloudHSMSoftwareLicense{TemplateLicense},
 	}
 	client := newTestLicenseClient(expected)
 	api := NewLicenseOp(client)
@@ -56,7 +56,7 @@ func TestLicenseOp_Read(t *testing.T) {
 	res, err := api.Read(ctx, "12345")
 	assert.NoError(err)
 	assert.NotNil(res)
-	assert.Equal(TemplateWrappedLicense.GetCloudHSM(), *res)
+	assert.Equal(TemplateWrappedLicense.GetLicense().Value, *res)
 }
 
 func TestLicenseOp_Read_404(t *testing.T) {
@@ -88,7 +88,7 @@ func TestLicenseOp_Create(t *testing.T) {
 	})
 	assert.NoError(err)
 	assert.NotNil(res)
-	assert.Equal(TemplateWrappedCreateLicense.GetCloudHSM(), *res)
+	assert.Equal(TemplateWrappedCreateLicense.GetLicense().Value, *res)
 }
 
 func TestLicenseOp_Create_422(t *testing.T) {
@@ -120,7 +120,7 @@ func TestLicenseOp_Update(t *testing.T) {
 	})
 	assert.NoError(err)
 	assert.NotNil(res)
-	assert.Equal(TemplateWrappedLicense.GetCloudHSM(), *res)
+	assert.Equal(TemplateWrappedLicense.GetLicense().Value, *res)
 }
 
 func TestLicenseOp_Update_400(t *testing.T) {

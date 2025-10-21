@@ -172,8 +172,8 @@ func TestCloudHSMIntegrated(t *testing.T) {
 		Name:        testutil.RandomName("test-cloudhsm-", 16, testutil.CharSetAlphaNum),
 		Description: ref(testutil.Random(128, testutil.CharSetAlphaNum)),
 		// This IP address is arbitrary, but recommended to be in the private range.
-		IPv4NetworkAddress: fmt.Sprintf("172.%d.%d.0", rand.Uint32N(31), rand.Uint32N(255)),
-		IPv4PrefixLength:   28,
+		Ipv4NetworkAddress: fmt.Sprintf("172.%d.%d.0", rand.Uint32N(31), rand.Uint32N(255)),
+		Ipv4PrefixLength:   28,
 	})
 	assert.NoError(err)
 	assert.NotNil(created)
@@ -200,11 +200,13 @@ func TestCloudHSMIntegrated(t *testing.T) {
 	// Update
 	newDesc := "updated integration test CloudHSM"
 	updateReq := CloudHSMUpdateParams{
-		Description: ref(newDesc),
-		Name:        read.GetName(),
+		Description:        ref(newDesc),
+		Name:               read.GetName(),
+		Ipv4NetworkAddress: read.Ipv4NetworkAddress,
+		Ipv4PrefixLength:   read.Ipv4PrefixLength,
 	}
 	updated, err := api.Update(ctx, created.GetID(), updateReq)
 	assert.NoError(err)
 	assert.NotNil(updated)
-	assert.Equal(newDesc, updated.GetDescription())
+	assert.Equal(newDesc, updated.GetDescription().Or("failure"))
 }
