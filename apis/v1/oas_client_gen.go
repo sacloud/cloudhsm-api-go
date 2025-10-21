@@ -57,7 +57,7 @@ type Invoker interface {
 	// CloudhsmCloudhsmsPeersCreate invokes cloudhsm_cloudhsms_peers_create operation.
 	//
 	// POST /cloudhsm/cloudhsms/{resource_id}/peers
-	CloudhsmCloudhsmsPeersCreate(ctx context.Context, request *WrappedCreateCloudHSMPeer, params CloudhsmCloudhsmsPeersCreateParams) (*WrappedCloudHSMPeer, error)
+	CloudhsmCloudhsmsPeersCreate(ctx context.Context, request *WrappedCreateCloudHSMPeer, params CloudhsmCloudhsmsPeersCreateParams) error
 	// CloudhsmCloudhsmsPeersDestroy invokes cloudhsm_cloudhsms_peers_destroy operation.
 	//
 	// DELETE /cloudhsm/cloudhsms/{resource_id}/peers/{peer_id}
@@ -879,12 +879,12 @@ func (c *Client) sendCloudhsmCloudhsmsList(ctx context.Context) (res *PaginatedC
 // CloudhsmCloudhsmsPeersCreate invokes cloudhsm_cloudhsms_peers_create operation.
 //
 // POST /cloudhsm/cloudhsms/{resource_id}/peers
-func (c *Client) CloudhsmCloudhsmsPeersCreate(ctx context.Context, request *WrappedCreateCloudHSMPeer, params CloudhsmCloudhsmsPeersCreateParams) (*WrappedCloudHSMPeer, error) {
-	res, err := c.sendCloudhsmCloudhsmsPeersCreate(ctx, request, params)
-	return res, err
+func (c *Client) CloudhsmCloudhsmsPeersCreate(ctx context.Context, request *WrappedCreateCloudHSMPeer, params CloudhsmCloudhsmsPeersCreateParams) error {
+	_, err := c.sendCloudhsmCloudhsmsPeersCreate(ctx, request, params)
+	return err
 }
 
-func (c *Client) sendCloudhsmCloudhsmsPeersCreate(ctx context.Context, request *WrappedCreateCloudHSMPeer, params CloudhsmCloudhsmsPeersCreateParams) (res *WrappedCloudHSMPeer, err error) {
+func (c *Client) sendCloudhsmCloudhsmsPeersCreate(ctx context.Context, request *WrappedCreateCloudHSMPeer, params CloudhsmCloudhsmsPeersCreateParams) (res *CloudhsmCloudhsmsPeersCreateNoContent, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [3]string

@@ -58,17 +58,17 @@ func (s *CloudHSM) SetFake() {
 	}
 	{
 		{
-			s.IPv4NetworkAddress = "string"
+			s.Ipv4NetworkAddress = "string"
 		}
 	}
 	{
 		{
-			s.IPv4PrefixLength = int(0)
+			s.Ipv4PrefixLength = int(0)
 		}
 	}
 	{
 		{
-			s.IPv4Address = "string"
+			s.Ipv4Address = "string"
 		}
 	}
 	{
@@ -135,7 +135,24 @@ func (s *CloudHSMPeer) SetFake() {
 	}
 	{
 		{
-			s.SecretKey = "string"
+			s.Index.SetFake()
+		}
+	}
+	{
+		{
+			s.Status.SetFake()
+		}
+	}
+	{
+		{
+			s.Routes = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Routes = append(s.Routes, elem)
+			}
 		}
 	}
 }
@@ -154,6 +171,11 @@ func (s *CloudHSMPeerList) SetFake() {
 			}
 		}
 	}
+}
+
+// SetFake set fake values.
+func (s *CloudHSMPeerStatus) SetFake() {
+	*s = CloudHSMPeerStatusDOWN
 }
 
 // SetFake set fake values.
@@ -258,17 +280,17 @@ func (s *CreateCloudHSM) SetFake() {
 	}
 	{
 		{
-			s.IPv4NetworkAddress = "string"
+			s.Ipv4NetworkAddress = "string"
 		}
 	}
 	{
 		{
-			s.IPv4PrefixLength = int(0)
+			s.Ipv4PrefixLength = int(0)
 		}
 	}
 	{
 		{
-			s.IPv4Address = "string"
+			s.Ipv4Address = "string"
 		}
 	}
 }
@@ -382,6 +404,33 @@ func (s *NilCloudHSMLocalRouter) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptCloudHSMPeerStatus) SetFake() {
+	var elem CloudHSMPeerStatus
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptCloudHSMSoftwareLicense) SetFake() {
+	var elem CloudHSMSoftwareLicense
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptCreateCloudHSMSoftwareLicense) SetFake() {
+	var elem CreateCloudHSMSoftwareLicense
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptInt) SetFake() {
 	var elem int
 	{
@@ -480,13 +529,13 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) SetFake() {
 	}
 	{
 		{
-			s.CloudHSMs = nil
+			s.Licenses = nil
 			for i := 0; i < 0; i++ {
 				var elem CloudHSMSoftwareLicense
 				{
 					elem.SetFake()
 				}
-				s.CloudHSMs = append(s.CloudHSMs, elem)
+				s.Licenses = append(s.Licenses, elem)
 			}
 		}
 	}
@@ -516,19 +565,10 @@ func (s *WrappedCloudHSMClient) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *WrappedCloudHSMPeer) SetFake() {
-	{
-		{
-			s.Peer.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
 func (s *WrappedCloudHSMSoftwareLicense) SetFake() {
 	{
 		{
-			s.CloudHSM.SetFake()
+			s.License.SetFake()
 		}
 	}
 }
@@ -564,7 +604,7 @@ func (s *WrappedCreateCloudHSMPeer) SetFake() {
 func (s *WrappedCreateCloudHSMSoftwareLicense) SetFake() {
 	{
 		{
-			s.CloudHSM.SetFake()
+			s.License.SetFake()
 		}
 	}
 }
