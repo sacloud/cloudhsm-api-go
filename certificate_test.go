@@ -16,9 +16,16 @@ package cloudhsm_test
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"math/big"
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	. "github.com/sacloud/cloudhsm-api-go"
 	v1 "github.com/sacloud/cloudhsm-api-go/apis/v1"
@@ -175,10 +182,14 @@ func TestCloudHSMClientIntegrated(t *testing.T) {
 	api, err := NewClientOp(client, hsm)
 	assert.NoError(err)
 
+	cn := testutil.RandomName("client-integrated-", 16, testutil.CharSetAlphaNum)
+	pem, _, err := certpem(cn)
+	assert.NoError(err)
+
 	// Create
 	created, err := api.Create(ctx, CloudHSMClientCreateParams{
-		Name:        "client-integrated",
-		Certificate: "cert-integrated",
+		Name:        cn,
+		Certificate: string(pem),
 	})
 	assert.NoError(err)
 	assert.NotNil(created)
@@ -194,4 +205,40 @@ func TestCloudHSMClientIntegrated(t *testing.T) {
 	assert.NoError(err)
 	assert.NotNil(clients)
 	assert.NotEmpty(clients)
+}
+
+func certpem(cn string) (certPEM, keyPEM []byte, err error) {
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	serial, err := rand.Int(rand.Reader, big.NewInt(1<<62))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	tmpl := x509.Certificate{
+		SerialNumber: serial,
+		Subject: pkix.Name{
+			CommonName:   cn,
+			Organization: []string{"Test Organization"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(365 * 24 * time.Hour),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+	}
+
+	derBytes, err := x509.CreateCertificate(rand.Reader, &tmpl, &tmpl, &key.PublicKey, key)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	certPEM = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
+	keyPEM = pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+
+	return certPEM, keyPEM, nil
 }
