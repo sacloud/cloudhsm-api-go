@@ -53,8 +53,8 @@ type CloudHSMCreateParams struct {
 	Name               string
 	Description        *string
 	Tags               []string
-	IPv4NetworkAddress string
-	IPv4PrefixLength   int
+	Ipv4NetworkAddress string
+	Ipv4PrefixLength   int
 }
 
 func (op *CloudHSMOp) Create(ctx context.Context, p CloudHSMCreateParams) (*v1.CreateCloudHSM, error) {
@@ -70,8 +70,8 @@ func (op *CloudHSMOp) Create(ctx context.Context, p CloudHSMCreateParams) (*v1.C
 				Tags:               p.Tags,
 				Availability:       v1.AvailabilityEnumAvailable,
 				ServiceClass:       v1.ServiceClassEnumCloudCloudhsmPartition,
-				IPv4NetworkAddress: p.IPv4NetworkAddress,
-				IPv4PrefixLength:   p.IPv4PrefixLength,
+				Ipv4NetworkAddress: p.Ipv4NetworkAddress,
+				Ipv4PrefixLength:   p.Ipv4PrefixLength,
 			},
 		},
 	)
@@ -112,8 +112,8 @@ type CloudHSMUpdateParams struct {
 	Name               string
 	Description        *string
 	Tags               []string
-	IPv4NetworkAddress string
-	IPv4PrefixLength   int
+	Ipv4NetworkAddress string
+	Ipv4PrefixLength   int
 }
 
 func (op *CloudHSMOp) Update(ctx context.Context, id string, p CloudHSMUpdateParams) (*v1.CloudHSM, error) {
@@ -130,8 +130,8 @@ func (op *CloudHSMOp) Update(ctx context.Context, id string, p CloudHSMUpdatePar
 				Name:               p.Name,
 				Description:        intoOpt[v1.OptString](p.Description),
 				Tags:               p.Tags,
-				IPv4NetworkAddress: p.IPv4NetworkAddress,
-				IPv4PrefixLength:   p.IPv4PrefixLength,
+				Ipv4NetworkAddress: p.Ipv4NetworkAddress,
+				Ipv4PrefixLength:   p.Ipv4PrefixLength,
 			},
 		},
 		v1.CloudhsmCloudhsmsUpdateParams{

@@ -46,7 +46,7 @@ func (op *LicenseOp) List(ctx context.Context) ([]v1.CloudHSMSoftwareLicense, er
 	if err != nil {
 		return nil, NewAPIError("License.List", 0, err)
 	}
-	return resp.CloudHSMs, nil
+	return resp.Licenses, nil
 }
 
 type CloudHSMSoftwareLicenseCreateParams struct {
@@ -62,17 +62,20 @@ func (op *LicenseOp) Create(ctx context.Context, p CloudHSMSoftwareLicenseCreate
 	resp, err := op.client.CloudhsmLicensesCreate(
 		ctx,
 		&v1.WrappedCreateCloudHSMSoftwareLicense{
-			CloudHSM: v1.CreateCloudHSMSoftwareLicense{
+			License: v1.NewOptCreateCloudHSMSoftwareLicense(v1.CreateCloudHSMSoftwareLicense{
 				ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
 				Name:         p.Name,
 				Description:  intoOpt[v1.OptString](p.Description),
 				Tags:         p.Tags,
-			},
+			}),
 		},
 	)
 
 	if err == nil {
-		ret := resp.GetCloudHSM()
+		ret, ok := resp.GetLicense().Get()
+		if !ok {
+			return nil, nil
+		}
 		return &ret, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
 		return nil, NewAPIError("License.Create", 0, err)
@@ -92,7 +95,10 @@ func (op *LicenseOp) Read(ctx context.Context, id string) (*v1.CloudHSMSoftwareL
 	)
 
 	if err == nil {
-		ret := resp.GetCloudHSM()
+		ret, ok := resp.GetLicense().Get()
+		if !ok {
+			return nil, nil
+		}
 		return &ret, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
 		return nil, NewAPIError("License.Read", 0, err)
@@ -117,12 +123,12 @@ func (op *LicenseOp) Update(ctx context.Context, id string, p CloudHSMSoftwareLi
 	resp, err := op.client.CloudhsmLicensesUpdate(
 		ctx,
 		&v1.WrappedCloudHSMSoftwareLicense{
-			CloudHSM: v1.CloudHSMSoftwareLicense{
+			License: v1.NewOptCloudHSMSoftwareLicense(v1.CloudHSMSoftwareLicense{
 				ServiceClass: v1.CloudHSMSoftwareLicenseServiceClassEnumCloudCloudhsmLicenseL7,
 				Name:         p.Name,
 				Description:  p.Description,
 				Tags:         p.Tags,
-			},
+			}),
 		},
 		v1.CloudhsmLicensesUpdateParams{
 			ResourceID: id,
@@ -130,7 +136,10 @@ func (op *LicenseOp) Update(ctx context.Context, id string, p CloudHSMSoftwareLi
 	)
 
 	if err == nil {
-		ret := resp.GetCloudHSM()
+		ret, ok := resp.GetLicense().Get()
+		if !ok {
+			return nil, nil
+		}
 		return &ret, nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
 		return nil, NewAPIError("License.Update", 0, err)

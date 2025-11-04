@@ -25,7 +25,7 @@ import (
 
 type PeerAPI interface {
 	List(ctx context.Context) ([]v1.CloudHSMPeer, error)
-	Create(ctx context.Context, request CloudHSMPeerCreateParams) (*v1.CloudHSMPeer, error)
+	Create(ctx context.Context, request CloudHSMPeerCreateParams) error
 	Delete(ctx context.Context, id string) error
 }
 
@@ -72,8 +72,8 @@ type CloudHSMPeerCreateParams struct {
 	SecretKey string
 }
 
-func (op *PeerOp) Create(ctx context.Context, p CloudHSMPeerCreateParams) (*v1.CloudHSMPeer, error) {
-	resp, err := op.client.CloudhsmCloudhsmsPeersCreate(
+func (op *PeerOp) Create(ctx context.Context, p CloudHSMPeerCreateParams) error {
+	err := op.client.CloudhsmCloudhsmsPeersCreate(
 		ctx,
 		&v1.WrappedCreateCloudHSMPeer{
 			Peer: v1.CreateCloudHSMPeer{
@@ -87,14 +87,13 @@ func (op *PeerOp) Create(ctx context.Context, p CloudHSMPeerCreateParams) (*v1.C
 	)
 
 	if err == nil {
-		ret := resp.GetPeer()
-		return &ret, nil
+		return nil
 	} else if e, ok := errors.Into[*ogen.UnexpectedStatusCodeError](err); !ok {
-		return nil, NewAPIError("Peer.Create", 0, err)
+		return NewAPIError("Peer.Create", 0, err)
 	} else if e.StatusCode == http.StatusUnprocessableEntity {
-		return nil, NewAPIError("Peer.Create", e.StatusCode, errors.Wrap(err, "invalid parameter"))
+		return NewAPIError("Peer.Create", e.StatusCode, errors.Wrap(err, "invalid parameter"))
 	} else {
-		return nil, NewAPIError("Peer.Create", e.StatusCode, errors.Wrap(err, "internal server error"))
+		return NewAPIError("Peer.Create", e.StatusCode, errors.Wrap(err, "internal server error"))
 	}
 }
 
@@ -102,7 +101,8 @@ func (op *PeerOp) Delete(ctx context.Context, id string) error {
 	err := op.client.CloudhsmCloudhsmsPeersDestroy(
 		ctx,
 		v1.CloudhsmCloudhsmsPeersDestroyParams{
-			ResourceID: id,
+			ResourceID: op.hsm.GetID(),
+			PeerID:     id,
 		},
 	)
 

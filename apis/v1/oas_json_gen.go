@@ -104,16 +104,16 @@ func (s *CloudHSM) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("IPv4NetworkAddress")
-		e.Str(s.IPv4NetworkAddress)
+		e.FieldStart("Ipv4NetworkAddress")
+		e.Str(s.Ipv4NetworkAddress)
 	}
 	{
-		e.FieldStart("IPv4PrefixLength")
-		e.Int(s.IPv4PrefixLength)
+		e.FieldStart("Ipv4PrefixLength")
+		e.Int(s.Ipv4PrefixLength)
 	}
 	{
-		e.FieldStart("IPv4Address")
-		e.Str(s.IPv4Address)
+		e.FieldStart("Ipv4Address")
+		e.Str(s.Ipv4Address)
 	}
 	{
 		e.FieldStart("LocalRouter")
@@ -130,9 +130,9 @@ var jsonFieldsNameOfCloudHSM = [12]string{
 	5:  "Name",
 	6:  "Description",
 	7:  "Tags",
-	8:  "IPv4NetworkAddress",
-	9:  "IPv4PrefixLength",
-	10: "IPv4Address",
+	8:  "Ipv4NetworkAddress",
+	9:  "Ipv4PrefixLength",
+	10: "Ipv4Address",
 	11: "LocalRouter",
 }
 
@@ -238,41 +238,41 @@ func (s *CloudHSM) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Tags\"")
 			}
-		case "IPv4NetworkAddress":
+		case "Ipv4NetworkAddress":
 			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
-				s.IPv4NetworkAddress = string(v)
+				s.Ipv4NetworkAddress = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPv4NetworkAddress\"")
+				return errors.Wrap(err, "decode field \"Ipv4NetworkAddress\"")
 			}
-		case "IPv4PrefixLength":
+		case "Ipv4PrefixLength":
 			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int()
-				s.IPv4PrefixLength = int(v)
+				s.Ipv4PrefixLength = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPv4PrefixLength\"")
+				return errors.Wrap(err, "decode field \"Ipv4PrefixLength\"")
 			}
-		case "IPv4Address":
+		case "Ipv4Address":
 			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
-				s.IPv4Address = string(v)
+				s.Ipv4Address = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPv4Address\"")
+				return errors.Wrap(err, "decode field \"Ipv4Address\"")
 			}
 		case "LocalRouter":
 			requiredBitSet[1] |= 1 << 3
@@ -610,14 +610,34 @@ func (s *CloudHSMPeer) encodeFields(e *jx.Encoder) {
 		e.Str(s.ID)
 	}
 	{
-		e.FieldStart("SecretKey")
-		e.Str(s.SecretKey)
+		if s.Index.Set {
+			e.FieldStart("Index")
+			s.Index.Encode(e)
+		}
+	}
+	{
+		if s.Status.Set {
+			e.FieldStart("Status")
+			s.Status.Encode(e)
+		}
+	}
+	{
+		if s.Routes != nil {
+			e.FieldStart("Routes")
+			e.ArrStart()
+			for _, elem := range s.Routes {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
 	}
 }
 
-var jsonFieldsNameOfCloudHSMPeer = [2]string{
+var jsonFieldsNameOfCloudHSMPeer = [4]string{
 	0: "ID",
-	1: "SecretKey",
+	1: "Index",
+	2: "Status",
+	3: "Routes",
 }
 
 // Decode decodes CloudHSMPeer from json.
@@ -641,17 +661,44 @@ func (s *CloudHSMPeer) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"ID\"")
 			}
-		case "SecretKey":
-			requiredBitSet[0] |= 1 << 1
+		case "Index":
 			if err := func() error {
-				v, err := d.Str()
-				s.SecretKey = string(v)
-				if err != nil {
+				s.Index.Reset()
+				if err := s.Index.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SecretKey\"")
+				return errors.Wrap(err, "decode field \"Index\"")
+			}
+		case "Status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Status\"")
+			}
+		case "Routes":
+			if err := func() error {
+				s.Routes = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Routes = append(s.Routes, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Routes\"")
 			}
 		default:
 			return d.Skip()
@@ -663,7 +710,7 @@ func (s *CloudHSMPeer) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -811,6 +858,50 @@ func (s *CloudHSMPeerList) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *CloudHSMPeerList) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CloudHSMPeerStatus as json.
+func (s CloudHSMPeerStatus) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes CloudHSMPeerStatus from json.
+func (s *CloudHSMPeerStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode CloudHSMPeerStatus to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch CloudHSMPeerStatus(v) {
+	case CloudHSMPeerStatusDOWN:
+		*s = CloudHSMPeerStatusDOWN
+	case CloudHSMPeerStatusUP:
+		*s = CloudHSMPeerStatusUP
+	case CloudHSMPeerStatusCLEANING:
+		*s = CloudHSMPeerStatusCLEANING
+	case CloudHSMPeerStatusEmpty:
+		*s = CloudHSMPeerStatusEmpty
+	default:
+		*s = CloudHSMPeerStatus(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s CloudHSMPeerStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *CloudHSMPeerStatus) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1107,16 +1198,16 @@ func (s *CreateCloudHSM) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		e.FieldStart("IPv4NetworkAddress")
-		e.Str(s.IPv4NetworkAddress)
+		e.FieldStart("Ipv4NetworkAddress")
+		e.Str(s.Ipv4NetworkAddress)
 	}
 	{
-		e.FieldStart("IPv4PrefixLength")
-		e.Int(s.IPv4PrefixLength)
+		e.FieldStart("Ipv4PrefixLength")
+		e.Int(s.Ipv4PrefixLength)
 	}
 	{
-		e.FieldStart("IPv4Address")
-		e.Str(s.IPv4Address)
+		e.FieldStart("Ipv4Address")
+		e.Str(s.Ipv4Address)
 	}
 }
 
@@ -1129,9 +1220,9 @@ var jsonFieldsNameOfCreateCloudHSM = [11]string{
 	5:  "Name",
 	6:  "Description",
 	7:  "Tags",
-	8:  "IPv4NetworkAddress",
-	9:  "IPv4PrefixLength",
-	10: "IPv4Address",
+	8:  "Ipv4NetworkAddress",
+	9:  "Ipv4PrefixLength",
+	10: "Ipv4Address",
 }
 
 // Decode decodes CreateCloudHSM from json.
@@ -1236,41 +1327,41 @@ func (s *CreateCloudHSM) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Tags\"")
 			}
-		case "IPv4NetworkAddress":
+		case "Ipv4NetworkAddress":
 			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
-				s.IPv4NetworkAddress = string(v)
+				s.Ipv4NetworkAddress = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPv4NetworkAddress\"")
+				return errors.Wrap(err, "decode field \"Ipv4NetworkAddress\"")
 			}
-		case "IPv4PrefixLength":
+		case "Ipv4PrefixLength":
 			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int()
-				s.IPv4PrefixLength = int(v)
+				s.Ipv4PrefixLength = int(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPv4PrefixLength\"")
+				return errors.Wrap(err, "decode field \"Ipv4PrefixLength\"")
 			}
-		case "IPv4Address":
+		case "Ipv4Address":
 			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
-				s.IPv4Address = string(v)
+				s.Ipv4Address = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPv4Address\"")
+				return errors.Wrap(err, "decode field \"Ipv4Address\"")
 			}
 		default:
 			return d.Skip()
@@ -1905,6 +1996,105 @@ func (s *NilCloudHSMLocalRouter) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes CloudHSMPeerStatus as json.
+func (o OptCloudHSMPeerStatus) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes CloudHSMPeerStatus from json.
+func (o *OptCloudHSMPeerStatus) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCloudHSMPeerStatus to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCloudHSMPeerStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCloudHSMPeerStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CloudHSMSoftwareLicense as json.
+func (o OptCloudHSMSoftwareLicense) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes CloudHSMSoftwareLicense from json.
+func (o *OptCloudHSMSoftwareLicense) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCloudHSMSoftwareLicense to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCloudHSMSoftwareLicense) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCloudHSMSoftwareLicense) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CreateCloudHSMSoftwareLicense as json.
+func (o OptCreateCloudHSMSoftwareLicense) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes CreateCloudHSMSoftwareLicense from json.
+func (o *OptCreateCloudHSMSoftwareLicense) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCreateCloudHSMSoftwareLicense to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCreateCloudHSMSoftwareLicense) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCreateCloudHSMSoftwareLicense) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes int as json.
 func (o OptInt) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -2315,14 +2505,12 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.CloudHSMs != nil {
-			e.FieldStart("CloudHSMs")
-			e.ArrStart()
-			for _, elem := range s.CloudHSMs {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+		e.FieldStart("Licenses")
+		e.ArrStart()
+		for _, elem := range s.Licenses {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 }
 
@@ -2330,7 +2518,7 @@ var jsonFieldsNameOfPaginatedCloudHSMSoftwareLicenseList = [4]string{
 	0: "Count",
 	1: "From",
 	2: "Total",
-	3: "CloudHSMs",
+	3: "Licenses",
 }
 
 // Decode decodes PaginatedCloudHSMSoftwareLicenseList from json.
@@ -2374,22 +2562,23 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Total\"")
 			}
-		case "CloudHSMs":
+		case "Licenses":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.CloudHSMs = make([]CloudHSMSoftwareLicense, 0)
+				s.Licenses = make([]CloudHSMSoftwareLicense, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
 					var elem CloudHSMSoftwareLicense
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
-					s.CloudHSMs = append(s.CloudHSMs, elem)
+					s.Licenses = append(s.Licenses, elem)
 					return nil
 				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CloudHSMs\"")
+				return errors.Wrap(err, "decode field \"Licenses\"")
 			}
 		default:
 			return d.Skip()
@@ -2401,7 +2590,7 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000001,
+		0b00001001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -2674,100 +2863,6 @@ func (s *WrappedCloudHSMClient) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *WrappedCloudHSMPeer) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *WrappedCloudHSMPeer) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("Peer")
-		s.Peer.Encode(e)
-	}
-}
-
-var jsonFieldsNameOfWrappedCloudHSMPeer = [1]string{
-	0: "Peer",
-}
-
-// Decode decodes WrappedCloudHSMPeer from json.
-func (s *WrappedCloudHSMPeer) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode WrappedCloudHSMPeer to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Peer":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				if err := s.Peer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Peer\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode WrappedCloudHSMPeer")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfWrappedCloudHSMPeer) {
-					name = jsonFieldsNameOfWrappedCloudHSMPeer[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *WrappedCloudHSMPeer) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *WrappedCloudHSMPeer) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
 func (s *WrappedCloudHSMSoftwareLicense) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -2777,13 +2872,15 @@ func (s *WrappedCloudHSMSoftwareLicense) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *WrappedCloudHSMSoftwareLicense) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("CloudHSM")
-		s.CloudHSM.Encode(e)
+		if s.License.Set {
+			e.FieldStart("License")
+			s.License.Encode(e)
+		}
 	}
 }
 
 var jsonFieldsNameOfWrappedCloudHSMSoftwareLicense = [1]string{
-	0: "CloudHSM",
+	0: "License",
 }
 
 // Decode decodes WrappedCloudHSMSoftwareLicense from json.
@@ -2791,19 +2888,18 @@ func (s *WrappedCloudHSMSoftwareLicense) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode WrappedCloudHSMSoftwareLicense to nil")
 	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "CloudHSM":
-			requiredBitSet[0] |= 1 << 0
+		case "License":
 			if err := func() error {
-				if err := s.CloudHSM.Decode(d); err != nil {
+				s.License.Reset()
+				if err := s.License.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CloudHSM\"")
+				return errors.Wrap(err, "decode field \"License\"")
 			}
 		default:
 			return d.Skip()
@@ -2811,38 +2907,6 @@ func (s *WrappedCloudHSMSoftwareLicense) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode WrappedCloudHSMSoftwareLicense")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfWrappedCloudHSMSoftwareLicense) {
-					name = jsonFieldsNameOfWrappedCloudHSMSoftwareLicense[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -3153,13 +3217,15 @@ func (s *WrappedCreateCloudHSMSoftwareLicense) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *WrappedCreateCloudHSMSoftwareLicense) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("CloudHSM")
-		s.CloudHSM.Encode(e)
+		if s.License.Set {
+			e.FieldStart("License")
+			s.License.Encode(e)
+		}
 	}
 }
 
 var jsonFieldsNameOfWrappedCreateCloudHSMSoftwareLicense = [1]string{
-	0: "CloudHSM",
+	0: "License",
 }
 
 // Decode decodes WrappedCreateCloudHSMSoftwareLicense from json.
@@ -3167,19 +3233,18 @@ func (s *WrappedCreateCloudHSMSoftwareLicense) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode WrappedCreateCloudHSMSoftwareLicense to nil")
 	}
-	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "CloudHSM":
-			requiredBitSet[0] |= 1 << 0
+		case "License":
 			if err := func() error {
-				if err := s.CloudHSM.Decode(d); err != nil {
+				s.License.Reset()
+				if err := s.License.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CloudHSM\"")
+				return errors.Wrap(err, "decode field \"License\"")
 			}
 		default:
 			return d.Skip()
@@ -3187,38 +3252,6 @@ func (s *WrappedCreateCloudHSMSoftwareLicense) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode WrappedCreateCloudHSMSoftwareLicense")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfWrappedCreateCloudHSMSoftwareLicense) {
-					name = jsonFieldsNameOfWrappedCreateCloudHSMSoftwareLicense[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
 	}
 
 	return nil

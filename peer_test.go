@@ -48,18 +48,16 @@ func TestCloudHSMPeerOp_List(t *testing.T) {
 
 func TestCloudHSMPeerOp_Create(t *testing.T) {
 	assert := require.New(t)
-	client := newTestCloudHSMPeerClient(TemplateWrappedCreateCloudHSMPeer)
+	client := newTestCloudHSMPeerClient(nil, http.StatusNoContent)
 	api, err := NewPeerOp(client, &TemplateCloudHSM)
 	assert.NoError(err)
 	ctx := context.Background()
 
-	res, err := api.Create(ctx, CloudHSMPeerCreateParams{
+	err = api.Create(ctx, CloudHSMPeerCreateParams{
 		RouterID:  "peer-2",
 		SecretKey: "secret-key-2",
 	})
 	assert.NoError(err)
-	assert.NotNil(res)
-	assert.Equal(TemplateWrappedCreateCloudHSMPeer.GetPeer(), v1.CreateCloudHSMPeer{ID: res.ID, SecretKey: res.SecretKey})
 }
 
 func TestCloudHSMPeerOp_Create_422(t *testing.T) {
@@ -70,8 +68,7 @@ func TestCloudHSMPeerOp_Create_422(t *testing.T) {
 	assert.NoError(err)
 	ctx := context.Background()
 
-	peer, err := api.Create(ctx, CloudHSMPeerCreateParams{})
-	assert.Nil(peer)
+	err = api.Create(ctx, CloudHSMPeerCreateParams{})
 	assert.Error(err)
 	assert.ErrorContains(err, "invalid")
 }
@@ -114,23 +111,56 @@ func TestCloudHSMPeerIntegrated(t *testing.T) {
 	api, err := NewPeerOp(client, hsm)
 	assert.NoError(err)
 
+	// There is no way to know what ID is assigned to the created peer,
+	// unless we list them all.
+	// First save the existing peers...
+	peers, err := api.List(ctx)
+	assert.NoError(err)
+	assert.NotNil(peers)
+	existingPeerIDs := []string{}
+	for _, p := range peers {
+		existingPeerIDs = append(existingPeerIDs, p.GetID())
+	}
+
 	// Create
-	created, err := api.Create(ctx, CloudHSMPeerCreateParams{
+	err = api.Create(ctx, CloudHSMPeerCreateParams{
 		RouterID:  "peer-integrated",
 		SecretKey: "secret-integrated",
 	})
 	assert.NoError(err)
-	assert.NotNil(created)
 
-	// Delete
-	t.Cleanup(func() {
-		err := api.Delete(ctx, created.GetID())
-		assert.NoError(err)
-	})
-
-	// List
-	peers, err := api.List(ctx)
+	// List again
+	peers, err = api.List(ctx)
 	assert.NoError(err)
 	assert.NotNil(peers)
 	assert.NotEmpty(peers)
+	newPeerIDs := []string{}
+	for _, p := range peers {
+		newPeerIDs = append(newPeerIDs, p.GetID())
+	}
+
+	// find
+	var createdPeerID string
+	for _, i := range newPeerIDs {
+		found := false
+		for _, j := range existingPeerIDs {
+			if i == j {
+				found = true
+				break
+			}
+		}
+		if !found {
+			createdPeerID = i
+			break
+		}
+	}
+
+	assert.NotEmpty(createdPeerID)
+
+	// Delete
+	t.Cleanup(func() {
+		err := api.Delete(ctx, createdPeerID)
+		assert.NoError(err)
+	})
+
 }

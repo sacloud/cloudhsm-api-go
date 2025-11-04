@@ -118,6 +118,36 @@ func (s *CloudHSMClient) Validate() error {
 	return nil
 }
 
+func (s *CloudHSMPeer) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Status.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "Status",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *CloudHSMPeerList) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -127,6 +157,23 @@ func (s *CloudHSMPeerList) Validate() error {
 	if err := func() error {
 		if s.Peers == nil {
 			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Peers {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -139,6 +186,21 @@ func (s *CloudHSMPeerList) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s CloudHSMPeerStatus) Validate() error {
+	switch s {
+	case "DOWN":
+		return nil
+	case "UP":
+		return nil
+	case "CLEANING":
+		return nil
+	case "":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *CloudHSMSoftwareLicense) Validate() error {
@@ -438,8 +500,11 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
+		if s.Licenses == nil {
+			return errors.New("nil is invalid value")
+		}
 		var failures []validate.FieldError
-		for i, elem := range s.CloudHSMs {
+		for i, elem := range s.Licenses {
 			if err := func() error {
 				if err := elem.Validate(); err != nil {
 					return err
@@ -458,7 +523,7 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "CloudHSMs",
+			Name:  "Licenses",
 			Error: err,
 		})
 	}
@@ -530,13 +595,20 @@ func (s *WrappedCloudHSMSoftwareLicense) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := s.CloudHSM.Validate(); err != nil {
-			return err
+		if value, ok := s.License.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "CloudHSM",
+			Name:  "License",
 			Error: err,
 		})
 	}
@@ -599,13 +671,20 @@ func (s *WrappedCreateCloudHSMSoftwareLicense) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := s.CloudHSM.Validate(); err != nil {
-			return err
+		if value, ok := s.License.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "CloudHSM",
+			Name:  "License",
 			Error: err,
 		})
 	}

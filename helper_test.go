@@ -116,14 +116,14 @@ var TemplateCreateLicense = func() v1.CreateCloudHSMSoftwareLicense {
 
 var TemplateWrappedCreateLicense = func() v1.WrappedCreateCloudHSMSoftwareLicense {
 	var ret v1.WrappedCreateCloudHSMSoftwareLicense
-	ret.SetCloudHSM(TemplateCreateLicense)
+	ret.SetLicense(v1.NewOptCreateCloudHSMSoftwareLicense(TemplateCreateLicense))
 
 	return ret
 }()
 
 var TemplateWrappedLicense = func() v1.WrappedCloudHSMSoftwareLicense {
 	var ret v1.WrappedCloudHSMSoftwareLicense
-	ret.SetCloudHSM(TemplateLicense)
+	ret.SetLicense(v1.NewOptCloudHSMSoftwareLicense(TemplateLicense))
 
 	return ret
 }()
@@ -162,13 +162,6 @@ var TemplateWrappedCloudHSM = func() v1.WrappedCloudHSM {
 var TemplateCloudHSMPeer = func() v1.CloudHSMPeer {
 	var ret v1.CloudHSMPeer
 	ret.SetFake()
-
-	return ret
-}()
-
-var TemplateWrappedCloudHSMPeer = func() v1.WrappedCloudHSMPeer {
-	var ret v1.WrappedCloudHSMPeer
-	ret.SetPeer(TemplateCloudHSMPeer)
 
 	return ret
 }()

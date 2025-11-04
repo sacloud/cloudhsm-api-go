@@ -104,9 +104,9 @@ type CloudHSM struct {
 	Name               string                 `json:"Name"`
 	Description        OptString              `json:"Description"`
 	Tags               []string               `json:"Tags"`
-	IPv4NetworkAddress string                 `json:"IPv4NetworkAddress"`
-	IPv4PrefixLength   int                    `json:"IPv4PrefixLength"`
-	IPv4Address        string                 `json:"IPv4Address"`
+	Ipv4NetworkAddress string                 `json:"Ipv4NetworkAddress"`
+	Ipv4PrefixLength   int                    `json:"Ipv4PrefixLength"`
+	Ipv4Address        string                 `json:"Ipv4Address"`
 	LocalRouter        NilCloudHSMLocalRouter `json:"LocalRouter"`
 }
 
@@ -150,19 +150,19 @@ func (s *CloudHSM) GetTags() []string {
 	return s.Tags
 }
 
-// GetIPv4NetworkAddress returns the value of IPv4NetworkAddress.
-func (s *CloudHSM) GetIPv4NetworkAddress() string {
-	return s.IPv4NetworkAddress
+// GetIpv4NetworkAddress returns the value of Ipv4NetworkAddress.
+func (s *CloudHSM) GetIpv4NetworkAddress() string {
+	return s.Ipv4NetworkAddress
 }
 
-// GetIPv4PrefixLength returns the value of IPv4PrefixLength.
-func (s *CloudHSM) GetIPv4PrefixLength() int {
-	return s.IPv4PrefixLength
+// GetIpv4PrefixLength returns the value of Ipv4PrefixLength.
+func (s *CloudHSM) GetIpv4PrefixLength() int {
+	return s.Ipv4PrefixLength
 }
 
-// GetIPv4Address returns the value of IPv4Address.
-func (s *CloudHSM) GetIPv4Address() string {
-	return s.IPv4Address
+// GetIpv4Address returns the value of Ipv4Address.
+func (s *CloudHSM) GetIpv4Address() string {
+	return s.Ipv4Address
 }
 
 // GetLocalRouter returns the value of LocalRouter.
@@ -210,19 +210,19 @@ func (s *CloudHSM) SetTags(val []string) {
 	s.Tags = val
 }
 
-// SetIPv4NetworkAddress sets the value of IPv4NetworkAddress.
-func (s *CloudHSM) SetIPv4NetworkAddress(val string) {
-	s.IPv4NetworkAddress = val
+// SetIpv4NetworkAddress sets the value of Ipv4NetworkAddress.
+func (s *CloudHSM) SetIpv4NetworkAddress(val string) {
+	s.Ipv4NetworkAddress = val
 }
 
-// SetIPv4PrefixLength sets the value of IPv4PrefixLength.
-func (s *CloudHSM) SetIPv4PrefixLength(val int) {
-	s.IPv4PrefixLength = val
+// SetIpv4PrefixLength sets the value of Ipv4PrefixLength.
+func (s *CloudHSM) SetIpv4PrefixLength(val int) {
+	s.Ipv4PrefixLength = val
 }
 
-// SetIPv4Address sets the value of IPv4Address.
-func (s *CloudHSM) SetIPv4Address(val string) {
-	s.IPv4Address = val
+// SetIpv4Address sets the value of Ipv4Address.
+func (s *CloudHSM) SetIpv4Address(val string) {
+	s.Ipv4Address = val
 }
 
 // SetLocalRouter sets the value of LocalRouter.
@@ -328,8 +328,10 @@ func (s *CloudHSMLocalRouter) SetSecretKey(val OptString) {
 
 // Ref: #/components/schemas/CloudHSMPeer
 type CloudHSMPeer struct {
-	ID        string `json:"ID"`
-	SecretKey string `json:"SecretKey"`
+	ID     string                `json:"ID"`
+	Index  OptInt                `json:"Index"`
+	Status OptCloudHSMPeerStatus `json:"Status"`
+	Routes []string              `json:"Routes"`
 }
 
 // GetID returns the value of ID.
@@ -337,9 +339,19 @@ func (s *CloudHSMPeer) GetID() string {
 	return s.ID
 }
 
-// GetSecretKey returns the value of SecretKey.
-func (s *CloudHSMPeer) GetSecretKey() string {
-	return s.SecretKey
+// GetIndex returns the value of Index.
+func (s *CloudHSMPeer) GetIndex() OptInt {
+	return s.Index
+}
+
+// GetStatus returns the value of Status.
+func (s *CloudHSMPeer) GetStatus() OptCloudHSMPeerStatus {
+	return s.Status
+}
+
+// GetRoutes returns the value of Routes.
+func (s *CloudHSMPeer) GetRoutes() []string {
+	return s.Routes
 }
 
 // SetID sets the value of ID.
@@ -347,9 +359,19 @@ func (s *CloudHSMPeer) SetID(val string) {
 	s.ID = val
 }
 
-// SetSecretKey sets the value of SecretKey.
-func (s *CloudHSMPeer) SetSecretKey(val string) {
-	s.SecretKey = val
+// SetIndex sets the value of Index.
+func (s *CloudHSMPeer) SetIndex(val OptInt) {
+	s.Index = val
+}
+
+// SetStatus sets the value of Status.
+func (s *CloudHSMPeer) SetStatus(val OptCloudHSMPeerStatus) {
+	s.Status = val
+}
+
+// SetRoutes sets the value of Routes.
+func (s *CloudHSMPeer) SetRoutes(val []string) {
+	s.Routes = val
 }
 
 // Ref: #/components/schemas/CloudHSMPeerList
@@ -365,6 +387,61 @@ func (s *CloudHSMPeerList) GetPeers() []CloudHSMPeer {
 // SetPeers sets the value of Peers.
 func (s *CloudHSMPeerList) SetPeers(val []CloudHSMPeer) {
 	s.Peers = val
+}
+
+type CloudHSMPeerStatus string
+
+const (
+	CloudHSMPeerStatusDOWN     CloudHSMPeerStatus = "DOWN"
+	CloudHSMPeerStatusUP       CloudHSMPeerStatus = "UP"
+	CloudHSMPeerStatusCLEANING CloudHSMPeerStatus = "CLEANING"
+	CloudHSMPeerStatusEmpty    CloudHSMPeerStatus = ""
+)
+
+// AllValues returns all CloudHSMPeerStatus values.
+func (CloudHSMPeerStatus) AllValues() []CloudHSMPeerStatus {
+	return []CloudHSMPeerStatus{
+		CloudHSMPeerStatusDOWN,
+		CloudHSMPeerStatusUP,
+		CloudHSMPeerStatusCLEANING,
+		CloudHSMPeerStatusEmpty,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s CloudHSMPeerStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case CloudHSMPeerStatusDOWN:
+		return []byte(s), nil
+	case CloudHSMPeerStatusUP:
+		return []byte(s), nil
+	case CloudHSMPeerStatusCLEANING:
+		return []byte(s), nil
+	case CloudHSMPeerStatusEmpty:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *CloudHSMPeerStatus) UnmarshalText(data []byte) error {
+	switch CloudHSMPeerStatus(data) {
+	case CloudHSMPeerStatusDOWN:
+		*s = CloudHSMPeerStatusDOWN
+		return nil
+	case CloudHSMPeerStatusUP:
+		*s = CloudHSMPeerStatusUP
+		return nil
+	case CloudHSMPeerStatusCLEANING:
+		*s = CloudHSMPeerStatusCLEANING
+		return nil
+	case CloudHSMPeerStatusEmpty:
+		*s = CloudHSMPeerStatusEmpty
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Ref: #/components/schemas/CloudHSMSoftwareLicense
@@ -490,6 +567,9 @@ type CloudhsmCloudhsmsClientsDestroyNoContent struct{}
 // CloudhsmCloudhsmsDestroyNoContent is response for CloudhsmCloudhsmsDestroy operation.
 type CloudhsmCloudhsmsDestroyNoContent struct{}
 
+// CloudhsmCloudhsmsPeersCreateNoContent is response for CloudhsmCloudhsmsPeersCreate operation.
+type CloudhsmCloudhsmsPeersCreateNoContent struct{}
+
 // CloudhsmCloudhsmsPeersDestroyNoContent is response for CloudhsmCloudhsmsPeersDestroy operation.
 type CloudhsmCloudhsmsPeersDestroyNoContent struct{}
 
@@ -506,9 +586,9 @@ type CreateCloudHSM struct {
 	Name               string           `json:"Name"`
 	Description        OptString        `json:"Description"`
 	Tags               []string         `json:"Tags"`
-	IPv4NetworkAddress string           `json:"IPv4NetworkAddress"`
-	IPv4PrefixLength   int              `json:"IPv4PrefixLength"`
-	IPv4Address        string           `json:"IPv4Address"`
+	Ipv4NetworkAddress string           `json:"Ipv4NetworkAddress"`
+	Ipv4PrefixLength   int              `json:"Ipv4PrefixLength"`
+	Ipv4Address        string           `json:"Ipv4Address"`
 }
 
 // GetID returns the value of ID.
@@ -551,19 +631,19 @@ func (s *CreateCloudHSM) GetTags() []string {
 	return s.Tags
 }
 
-// GetIPv4NetworkAddress returns the value of IPv4NetworkAddress.
-func (s *CreateCloudHSM) GetIPv4NetworkAddress() string {
-	return s.IPv4NetworkAddress
+// GetIpv4NetworkAddress returns the value of Ipv4NetworkAddress.
+func (s *CreateCloudHSM) GetIpv4NetworkAddress() string {
+	return s.Ipv4NetworkAddress
 }
 
-// GetIPv4PrefixLength returns the value of IPv4PrefixLength.
-func (s *CreateCloudHSM) GetIPv4PrefixLength() int {
-	return s.IPv4PrefixLength
+// GetIpv4PrefixLength returns the value of Ipv4PrefixLength.
+func (s *CreateCloudHSM) GetIpv4PrefixLength() int {
+	return s.Ipv4PrefixLength
 }
 
-// GetIPv4Address returns the value of IPv4Address.
-func (s *CreateCloudHSM) GetIPv4Address() string {
-	return s.IPv4Address
+// GetIpv4Address returns the value of Ipv4Address.
+func (s *CreateCloudHSM) GetIpv4Address() string {
+	return s.Ipv4Address
 }
 
 // SetID sets the value of ID.
@@ -606,19 +686,19 @@ func (s *CreateCloudHSM) SetTags(val []string) {
 	s.Tags = val
 }
 
-// SetIPv4NetworkAddress sets the value of IPv4NetworkAddress.
-func (s *CreateCloudHSM) SetIPv4NetworkAddress(val string) {
-	s.IPv4NetworkAddress = val
+// SetIpv4NetworkAddress sets the value of Ipv4NetworkAddress.
+func (s *CreateCloudHSM) SetIpv4NetworkAddress(val string) {
+	s.Ipv4NetworkAddress = val
 }
 
-// SetIPv4PrefixLength sets the value of IPv4PrefixLength.
-func (s *CreateCloudHSM) SetIPv4PrefixLength(val int) {
-	s.IPv4PrefixLength = val
+// SetIpv4PrefixLength sets the value of Ipv4PrefixLength.
+func (s *CreateCloudHSM) SetIpv4PrefixLength(val int) {
+	s.Ipv4PrefixLength = val
 }
 
-// SetIPv4Address sets the value of IPv4Address.
-func (s *CreateCloudHSM) SetIPv4Address(val string) {
-	s.IPv4Address = val
+// SetIpv4Address sets the value of Ipv4Address.
+func (s *CreateCloudHSM) SetIpv4Address(val string) {
+	s.Ipv4Address = val
 }
 
 // Ref: #/components/schemas/CreateCloudHSMClient
@@ -845,6 +925,144 @@ func (o NilCloudHSMLocalRouter) Or(d CloudHSMLocalRouter) CloudHSMLocalRouter {
 	return d
 }
 
+// NewOptCloudHSMPeerStatus returns new OptCloudHSMPeerStatus with value set to v.
+func NewOptCloudHSMPeerStatus(v CloudHSMPeerStatus) OptCloudHSMPeerStatus {
+	return OptCloudHSMPeerStatus{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCloudHSMPeerStatus is optional CloudHSMPeerStatus.
+type OptCloudHSMPeerStatus struct {
+	Value CloudHSMPeerStatus
+	Set   bool
+}
+
+// IsSet returns true if OptCloudHSMPeerStatus was set.
+func (o OptCloudHSMPeerStatus) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCloudHSMPeerStatus) Reset() {
+	var v CloudHSMPeerStatus
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCloudHSMPeerStatus) SetTo(v CloudHSMPeerStatus) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCloudHSMPeerStatus) Get() (v CloudHSMPeerStatus, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCloudHSMPeerStatus) Or(d CloudHSMPeerStatus) CloudHSMPeerStatus {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptCloudHSMSoftwareLicense returns new OptCloudHSMSoftwareLicense with value set to v.
+func NewOptCloudHSMSoftwareLicense(v CloudHSMSoftwareLicense) OptCloudHSMSoftwareLicense {
+	return OptCloudHSMSoftwareLicense{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCloudHSMSoftwareLicense is optional CloudHSMSoftwareLicense.
+type OptCloudHSMSoftwareLicense struct {
+	Value CloudHSMSoftwareLicense
+	Set   bool
+}
+
+// IsSet returns true if OptCloudHSMSoftwareLicense was set.
+func (o OptCloudHSMSoftwareLicense) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCloudHSMSoftwareLicense) Reset() {
+	var v CloudHSMSoftwareLicense
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCloudHSMSoftwareLicense) SetTo(v CloudHSMSoftwareLicense) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCloudHSMSoftwareLicense) Get() (v CloudHSMSoftwareLicense, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCloudHSMSoftwareLicense) Or(d CloudHSMSoftwareLicense) CloudHSMSoftwareLicense {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptCreateCloudHSMSoftwareLicense returns new OptCreateCloudHSMSoftwareLicense with value set to v.
+func NewOptCreateCloudHSMSoftwareLicense(v CreateCloudHSMSoftwareLicense) OptCreateCloudHSMSoftwareLicense {
+	return OptCreateCloudHSMSoftwareLicense{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCreateCloudHSMSoftwareLicense is optional CreateCloudHSMSoftwareLicense.
+type OptCreateCloudHSMSoftwareLicense struct {
+	Value CreateCloudHSMSoftwareLicense
+	Set   bool
+}
+
+// IsSet returns true if OptCreateCloudHSMSoftwareLicense was set.
+func (o OptCreateCloudHSMSoftwareLicense) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCreateCloudHSMSoftwareLicense) Reset() {
+	var v CreateCloudHSMSoftwareLicense
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCreateCloudHSMSoftwareLicense) SetTo(v CreateCloudHSMSoftwareLicense) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCreateCloudHSMSoftwareLicense) Get() (v CreateCloudHSMSoftwareLicense, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCreateCloudHSMSoftwareLicense) Or(d CreateCloudHSMSoftwareLicense) CreateCloudHSMSoftwareLicense {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptInt returns new OptInt with value set to v.
 func NewOptInt(v int) OptInt {
 	return OptInt{
@@ -1035,10 +1253,10 @@ func (s *PaginatedCloudHSMList) SetCloudHSMs(val []CloudHSM) {
 
 // Ref: #/components/schemas/PaginatedCloudHSMSoftwareLicenseList
 type PaginatedCloudHSMSoftwareLicenseList struct {
-	Count     int                       `json:"Count"`
-	From      OptInt                    `json:"From"`
-	Total     OptInt                    `json:"Total"`
-	CloudHSMs []CloudHSMSoftwareLicense `json:"CloudHSMs"`
+	Count    int                       `json:"Count"`
+	From     OptInt                    `json:"From"`
+	Total    OptInt                    `json:"Total"`
+	Licenses []CloudHSMSoftwareLicense `json:"Licenses"`
 }
 
 // GetCount returns the value of Count.
@@ -1056,9 +1274,9 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) GetTotal() OptInt {
 	return s.Total
 }
 
-// GetCloudHSMs returns the value of CloudHSMs.
-func (s *PaginatedCloudHSMSoftwareLicenseList) GetCloudHSMs() []CloudHSMSoftwareLicense {
-	return s.CloudHSMs
+// GetLicenses returns the value of Licenses.
+func (s *PaginatedCloudHSMSoftwareLicenseList) GetLicenses() []CloudHSMSoftwareLicense {
+	return s.Licenses
 }
 
 // SetCount sets the value of Count.
@@ -1076,9 +1294,9 @@ func (s *PaginatedCloudHSMSoftwareLicenseList) SetTotal(val OptInt) {
 	s.Total = val
 }
 
-// SetCloudHSMs sets the value of CloudHSMs.
-func (s *PaginatedCloudHSMSoftwareLicenseList) SetCloudHSMs(val []CloudHSMSoftwareLicense) {
-	s.CloudHSMs = val
+// SetLicenses sets the value of Licenses.
+func (s *PaginatedCloudHSMSoftwareLicenseList) SetLicenses(val []CloudHSMSoftwareLicense) {
+	s.Licenses = val
 }
 
 // * `cloud/cloudhsm/partition` - Type-L7.
@@ -1147,34 +1365,19 @@ func (s *WrappedCloudHSMClient) SetClient(val CloudHSMClient) {
 	s.Client = val
 }
 
-// Ref: #/components/schemas/WrappedCloudHSMPeer
-type WrappedCloudHSMPeer struct {
-	Peer CloudHSMPeer `json:"Peer"`
-}
-
-// GetPeer returns the value of Peer.
-func (s *WrappedCloudHSMPeer) GetPeer() CloudHSMPeer {
-	return s.Peer
-}
-
-// SetPeer sets the value of Peer.
-func (s *WrappedCloudHSMPeer) SetPeer(val CloudHSMPeer) {
-	s.Peer = val
-}
-
 // Ref: #/components/schemas/WrappedCloudHSMSoftwareLicense
 type WrappedCloudHSMSoftwareLicense struct {
-	CloudHSM CloudHSMSoftwareLicense `json:"CloudHSM"`
+	License OptCloudHSMSoftwareLicense `json:"License"`
 }
 
-// GetCloudHSM returns the value of CloudHSM.
-func (s *WrappedCloudHSMSoftwareLicense) GetCloudHSM() CloudHSMSoftwareLicense {
-	return s.CloudHSM
+// GetLicense returns the value of License.
+func (s *WrappedCloudHSMSoftwareLicense) GetLicense() OptCloudHSMSoftwareLicense {
+	return s.License
 }
 
-// SetCloudHSM sets the value of CloudHSM.
-func (s *WrappedCloudHSMSoftwareLicense) SetCloudHSM(val CloudHSMSoftwareLicense) {
-	s.CloudHSM = val
+// SetLicense sets the value of License.
+func (s *WrappedCloudHSMSoftwareLicense) SetLicense(val OptCloudHSMSoftwareLicense) {
+	s.License = val
 }
 
 // Ref: #/components/schemas/WrappedCreateCloudHSM
@@ -1224,15 +1427,15 @@ func (s *WrappedCreateCloudHSMPeer) SetPeer(val CreateCloudHSMPeer) {
 
 // Ref: #/components/schemas/WrappedCreateCloudHSMSoftwareLicense
 type WrappedCreateCloudHSMSoftwareLicense struct {
-	CloudHSM CreateCloudHSMSoftwareLicense `json:"CloudHSM"`
+	License OptCreateCloudHSMSoftwareLicense `json:"License"`
 }
 
-// GetCloudHSM returns the value of CloudHSM.
-func (s *WrappedCreateCloudHSMSoftwareLicense) GetCloudHSM() CreateCloudHSMSoftwareLicense {
-	return s.CloudHSM
+// GetLicense returns the value of License.
+func (s *WrappedCreateCloudHSMSoftwareLicense) GetLicense() OptCreateCloudHSMSoftwareLicense {
+	return s.License
 }
 
-// SetCloudHSM sets the value of CloudHSM.
-func (s *WrappedCreateCloudHSMSoftwareLicense) SetCloudHSM(val CreateCloudHSMSoftwareLicense) {
-	s.CloudHSM = val
+// SetLicense sets the value of License.
+func (s *WrappedCreateCloudHSMSoftwareLicense) SetLicense(val OptCreateCloudHSMSoftwareLicense) {
+	s.License = val
 }
