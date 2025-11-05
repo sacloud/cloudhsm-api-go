@@ -1,39 +1,121 @@
-# sacloud/go-template
+# cloudhsm-api-go
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/sacloud/go-template.svg)](https://pkg.go.dev/github.com/sacloud/go-template)
-[![Tests](https://github.com/sacloud/go-template/workflows/Tests/badge.svg)](https://github.com/sacloud/go-template/actions/workflows/tests.yaml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/sacloud/go-template)](https://goreportcard.com/report/github.com/sacloud/go-template)
+[![Go Reference](https://pkg.go.dev/badge/github.com/sacloud/cloudhsm-api-go.svg)](https://pkg.go.dev/github.com/sacloud/cloudhsm-api-go)
+[![Tests](https://github.com/sacloud/cloudhsm-api-go/workflows/Tests/badge.svg)](https://github.com/sacloud/cloudhsm-api-go/actions/workflows/tests.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sacloud/cloudhsm-api-go)](https://goreportcard.com/report/github.com/sacloud/cloudhsm-api-go)
 
-さくらのクラウド向けOSSプロダクトでのプロジェクトテンプレート(Go)
+さくらのクラウド「クラウドHSM」APIのGoクライアントライブラリ
 
 ## 概要
 
-さくらのクラウド向けOSSプロダクトでGo言語を中心に用いるプロジェクトのためのテンプレート
+このライブラリは、さくらのクラウド「クラウドHSM」APIをGo言語から利用するためのクライアントです。
+OpenAPI仕様から自動生成された型安全なAPIクライアントと、それをラップして使い勝手を向上させたクライアントを提供します。
+
+> [!WARNING]
+> v1.0に達するまでは互換性のない形で変更される可能性がありますのでご注意ください。
+
+
+## インストール
+
+```bash
+go get github.com/sacloud/cloudhsm-api-go
+```
 
 ## 使い方
 
-GitHubでリポジトリを作成する際にテンプレートとしてsacloud/go-templateを選択して作成します。  
-![テンプレートの選択](docs/new_repo.png)
+### 事前準備
 
-次に`go-teplate`という文字列を自身のプロジェクトのものに置き換えてください。
+SDKを利用開始するにはさくらのクラウド「クラウドHSM」自体を利用開始する必要があります。執筆時点ではさくらのクラウドの利用申請とは別途クラウドHSMの利用申請も必要です。申請手順の詳細に関しては[クラウドHSMマニュアル](https://manual.sakura.ad.jp/cloud/appliance/cloudhsm/index.html)をご参照ください。
 
-例: exampleという名前のプロジェクトを作成する場合
+### 認証情報
 
-```bash
-# 作成したプロジェクトのディレクトリに移動
-cd example
-# 置き換え
-find . -type f | xargs sed -i '' -e "s/go-template/example/g"
+APIを実行するには認証が必要です。インタラクティブな環境の場合おすすめは [`usacloud`](https://github.com/sacloud/usacloud) を使って設定ファイルを作成することです。たとえば
+
+```sh
+usacloud config create --name is1a
 ```
 
-### DockerイメージをGitHub Container Registryで公開する際の注意点
+にて作成したプロファイル `is1a` があるとすると、SDKとしては、
 
-デフォルトでは`CR_PAT`が渡されないためGitHub Actionsでのイメージのビルド/プッシュに失敗します。
-また、パッケージを公開したい場合は初回のみ手作業が必要です。
+```golang
+import (
+    cloudhsm "github.com/sacloud/cloudhsm-api-go"
+    client "github.com/sacloud/api-client-go"
+)
 
-このためDockerイメージをGitHub Container Registryで公開したい場合はオーガニゼーション管理者にご相談ください。
+func main() {
+    client, err := cloudhsm.NewClient(client.WithProfile("is1a"))
 
-## License
+    // 以下略
+}
+```
 
-`go-template` Copyright (C) 2022-2025 The sacloud/go-template authors.
-This project is published under [Apache 2.0 License](LICENSE).
+のようにして読み込むことができます。
+
+一方でCI環境のようにファイルに書き出すのが適切ではない場合、環境変数経由で
+
+```golang
+import (
+    "os"
+
+    cloudhsm "github.com/sacloud/cloudhsm-api-go"
+    client "github.com/sacloud/api-client-go"
+)
+
+func main() {
+    client, err := cloudhsm.NewClient(client.WithApiKeys(
+        os.Getenv("SAKURACLOUD_ACCESS_TOKEN"),
+        os.Getenv("SAKURACLOUD_ACCESS_TOKEN_SECRET"),
+    ))
+
+    // 以下略
+}
+```
+
+のように指定できます。
+
+### SDK
+
+```go
+package main
+
+import (
+    "context"
+
+    cloudhsm "github.com/sacloud/cloudhsm-api-go"
+)
+
+func main() {
+    ctx := context.Background()
+    client, err := cloudhsm.NewClient()
+    if err != nil {
+        // エラーハンドリング
+    }
+
+    // 例: ライセンス一覧取得
+    licenses, err := cloudhsm.NewLicenseOp(client).List(ctx)
+    if err != nil {
+        // エラーハンドリング
+    }
+}
+```
+
+APIの詳細は[GoDoc](https://pkg.go.dev/github.com/sacloud/cloudhsm-api-go)や`apis/v1/`配下の型定義を参照してください。
+
+## OpenAPI仕様について
+
+`openapi/openapi.json`は[KMS/SecretManager/CloudHSM API](https://manual.sakura.ad.jp/api/cloud/security-encryption/)からダウンロードしたものを一部加工しています。
+
+## 開発
+
+ビルドやテストはMakefile経由で実行できます。
+
+```bash
+make
+make test
+```
+
+## ライセンス
+
+Copyright (C) 2022-2025 The sacloud/cloudhsm-api-go Authors.
+このプロジェクトは[Apache 2.0 License](LICENSE)の下で公開されています。
