@@ -162,5 +162,4 @@ func TestCloudHSMPeerIntegrated(t *testing.T) {
 		err := api.Delete(ctx, createdPeerID)
 		assert.NoError(err)
 	})
-
 }
