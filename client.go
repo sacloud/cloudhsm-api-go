@@ -91,3 +91,22 @@ func NewClientWithApiUrlAndClient(apiUrl string, apiClient *http.Client, params 
 
 	return d, nil
 }
+
+func WithZone(z string) client.ClientParam {
+	// 現在対応している既知のゾーン
+	switch z {
+	case "is1b":
+		return func(p *client.ClientParams) {
+			p.APIRootURL = "https://secure.sakura.ad.jp/cloud/zone/is1b/api/cloud/1.1/"
+		}
+	case "tk1a":
+		return func(p *client.ClientParams) {
+			p.APIRootURL = "https://secure.sakura.ad.jp/cloud/zone/tk1a/api/cloud/1.1/"
+		}
+	default:
+		// 未知(あるいは未サポート)のゾーン
+		// エラーを返す方法がないのでpanic
+		// funcの中でpanicすることもできるが、エラー検知は早い方がいいだろう
+		panic("unsupported zone: " + z)
+	}
+}
