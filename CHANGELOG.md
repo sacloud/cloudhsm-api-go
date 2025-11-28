@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.2.0](https://github.com/sacloud/cloudhsm-api-go/compare/v0.1.0...v0.2.0) - 2025-11-28
+- ignore CHANGELOG.md by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/15
+- add WithZone() option by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/16
+- ci: bump actions/setup-go from 6.0.0 to 6.1.0 by @dependabot[bot] in https://github.com/sacloud/cloudhsm-api-go/pull/17
+- ci: bump actions/checkout from 5.0.0 to 6.0.0 by @dependabot[bot] in https://github.com/sacloud/cloudhsm-api-go/pull/18
+
 ## [v0.1.0](https://github.com/sacloud/cloudhsm-api-go/commits/v0.1.0) - 2025-11-17
 - fundamental parts by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/5
 - initial implementation of LicenseAPI by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/7
