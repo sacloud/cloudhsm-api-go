@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.3.0](https://github.com/sacloud/cloudhsm-api-go/compare/v0.2.0...v0.3.0) - 2026-01-29
+- toolchain update to Go 1.25.6 by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/26
+- ci: bump actions/setup-go from 6.1.0 to 6.2.0 by @dependabot[bot] in https://github.com/sacloud/cloudhsm-api-go/pull/23
+- ci: bump actions/checkout from 6.0.0 to 6.0.2 by @dependabot[bot] in https://github.com/sacloud/cloudhsm-api-go/pull/24
+
 ## [v0.2.0](https://github.com/sacloud/cloudhsm-api-go/compare/v0.1.0...v0.2.0) - 2025-11-28
 - ignore CHANGELOG.md by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/15
 - add WithZone() option by @shyouhei in https://github.com/sacloud/cloudhsm-api-go/pull/16
