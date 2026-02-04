@@ -172,10 +172,10 @@ func TestCloudHSMClientIntegrated(t *testing.T) {
 	assert := require.New(t)
 	client := newIntegratedClient(t)
 
-	testutil.PreCheckEnvsFunc("SAKURACLOUD_CLOUDHSM_ID")(t)
+	testutil.PreCheckEnvsFunc("SAKURA_CLOUDHSM_ID")(t)
 
 	ctx := context.Background()
-	hsm, err := NewCloudHSMOp(client).Read(ctx, os.Getenv("SAKURACLOUD_CLOUDHSM_ID"))
+	hsm, err := NewCloudHSMOp(client).Read(ctx, os.Getenv("SAKURA_CLOUDHSM_ID"))
 	assert.NoError(err)
 	assert.NotNil(hsm)
 	assert.Equal(v1.AvailabilityEnumAvailable, hsm.GetAvailability())
