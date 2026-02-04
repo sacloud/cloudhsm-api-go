@@ -6,7 +6,6 @@ BIN            ?= cloudhsm-api-go
 GO_FILES       ?= $(shell find . -name '*.go')
 
 include includes/go/common.mk
-include includes/go/single.mk
 #====================
 
 default: $(DEFAULT_GOALS)
